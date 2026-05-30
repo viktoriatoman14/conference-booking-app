@@ -17,7 +17,7 @@ namespace ConferenceBookingApp.Models
         public string Floor { get; set; } = string.Empty;
 
 
-        [Display(Name = "Czy dostępna?")]
+        [Display(Name = "Dostępność")]
         public bool IsAvailable { get; set; } = true;
 
         public ICollection<Bookings> Bookings { get; set; } = new List<Bookings>();
