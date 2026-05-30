@@ -12,7 +12,7 @@ ASP.NET Core MVC + Entity Framework Core + MS SQL Server + Bootstrap 5. Architek
 
 Miejsce instalacji i repozytorium:
 Docelowo: serwer VPS Linux / Azure App Service
-Repozytorium: https://github.com/student-demo/conference-booking-app
+Repozytorium: https://github.com/viktoriatoman14/conference-booking-app
 
 Odpowiedzialność w projekcie:
 Projekt realizowany indywidualnie – pełna odpowiedzialność za frontend, backend oraz bazę danych.
