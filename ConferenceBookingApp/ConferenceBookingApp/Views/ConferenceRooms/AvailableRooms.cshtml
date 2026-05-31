@@ -1,0 +1,78 @@
+﻿@model IEnumerable<ConferenceBookingApp.Models.ConferenceRooms>
+
+@{
+    ViewData["Title"] = "Sprawdź dostępność sal";
+}
+
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white py-3">
+            <h4 class="mb-0">🔎 Znajdź wolną salę konferencyjną</h4>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="AvailableRooms" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Data spotkania</label>
+                    <input type="date" name="searchDate" value="@ViewBag.SearchDate" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Od godziny</label>
+                    <input type="time" name="startTime" value="@ViewBag.StartTime" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Do godziny</label>
+                    <input type="time" name="endTime" value="@ViewBag.EndTime" class="form-control" required />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">Sprawdź</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.Searched == true)
+    {
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">
+                Wyniki wyszukiwania dla terminu: @ViewBag.SearchDate (@ViewBag.StartTime - @ViewBag.EndTime)
+            </div>
+            <div class="card-body">
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-warning text-center mb-0">Niestety, w tych godzinach wszystkie sale są już zajęte.</div>
+                }
+                else
+                {
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Numer Sali</th>
+                                <th>Piętro</th>
+                                <th>Akcja</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var room in Model)
+                            {
+                                <tr>
+                                    <td><strong>Sala nr @room.Nnumber</strong></td>
+                                    <td>@room.Floor</td>
+                                    <td>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-controller="Bookings" asp-action="Create" class="btn btn-outline-primary btn-sm">Zarezerwuj tę salę</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Tylko Admin może rezerwować</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    }
+</div>

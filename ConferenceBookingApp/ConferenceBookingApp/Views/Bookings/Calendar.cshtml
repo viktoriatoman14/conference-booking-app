@@ -1,0 +1,144 @@
+﻿@{
+    ViewData["Title"] = "Kalendarz Rezerwacji";
+}
+
+<div class="container mt-4">
+    <div class="card shadow rounded-4 overflow-hidden border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3 px-4">
+            <h4 class="mb-0 fw-semibold">📅 Harmonogram Rezerwacji Sal</h4>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" class="btn btn-success btn-sm rounded-3 px-3 fw-medium shadow-sm">Dodaj rezerwację</a>
+            }
+        </div>
+        <div class="card-body p-4 bg-white">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/pl.global.min.js"></script>
+
+<style>
+    #calendar {
+        max-width: 100%;
+        margin: 0 auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* WYMUSZENIE SZEROKOŚCI: Gwarancja, że zmieści się pełny tekst typu "12:00" */
+    .fc .fc-timegrid-axis,
+    .fc .fc-timegrid-slot-label {
+        width: 75px !important;
+        min-width: 75px !important;
+        max-width: 75px !important;
+        background-color: #f8f9fa !important; /* Estetyczne jasne tło dla kolumny godzin */
+    }
+
+    /* Formatowanie tekstu godzin na osi - ciemniejsza i bardziej czytelna czcionka */
+    .fc .fc-timegrid-slot-label-cushion {
+        display: block !important;
+        text-align: right !important;
+        padding-right: 10px !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        color: #212529 !important; /* Głęboka, czytelna czerń */
+    }
+
+    /* Wygląd nagłówków dni tygodnia */
+    .fc .fc-col-header-cell {
+        background-color: #f8f9fa !important;
+        padding: 10px 0 !important;
+        border-color: #e9ecef !important;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        color: #0d6efd !important;
+    }
+
+    /* Estetyka siatki i klocków rezerwacji */
+    .fc .fc-timegrid-slots td {
+        border-color: #f1f3f5 !important;
+        height: 3.5rem !important; /* Nieco wyższe wiersze dla jeszcze większej przejrzystości */
+    }
+
+    /* Wygląd wydarzeń (klocków rezerwacji) */
+    .fc-v-event {
+        border: none !important;
+        border-left: 4px solid #0d6efd !important;
+        border-radius: 6px !important;
+        padding: 6px 8px !important;
+        background-color: #e7f1ff !important; /* Delikatne niebieskie tło klocka */
+        color: #0c4128 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+    }
+
+    /* Stylizacja przycisków nawigacji FullCalendar, aby pasowały do motywu bg-dark */
+    .fc .fc-button-primary {
+        background-color: #2b3035 !important;
+        border-color: #2b3035 !important;
+        font-weight: 500 !important;
+        text-transform: capitalize !important;
+        transition: background-color 0.15s ease-in-out !important;
+    }
+
+        .fc .fc-button-primary:hover {
+            background-color: #1c1f23 !important;
+            border-color: #1c1f23 !important;
+        }
+
+        .fc .fc-button-primary:disabled {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            opacity: 0.65;
+        }
+
+    /* Styl dla aktywnego widoku (np. wciśnięty przycisk "Tydzień") */
+    .fc .fc-button-active {
+        background-color: #000000 !important;
+        border-color: #000000 !important;
+    }
+
+    /* Zaokrąglenie ramek samego kalendarza wewnątrz karty */
+    .fc-theme-standard th, .fc-theme-standard td {
+        border-color: #e9ecef !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            locale: 'pl',
+            slotMinTime: '08:00:00',
+            slotMaxTime: '23:00:00',
+            allDaySlot: false,
+            slotDuration: '01:00:00', // Linie siatki co pełną godzinę
+
+            // NADPISANIE FORMATU: To bezpośrednio wymusza format "8:00" zamiast systemowego "08"
+            slotLabelFormat: {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: false
+            },
+
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: '/Bookings/GetCalendarData',
+            eventClick: function(info) {
+                window.location.href = '/Bookings/Details/' + info.event.id;
+            }
+        });
+
+        calendar.render();
+    });
+</script>

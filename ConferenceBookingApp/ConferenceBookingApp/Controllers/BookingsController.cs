@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ConferenceBookingApp.Controllers
 {
- 
+
 
     public class BookingsController : Controller
     {
@@ -24,6 +24,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Bookings
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Index()
         {
             // Dołączamy zarówno salę, jak i profesora do zapytania
@@ -36,6 +37,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Bookings/Details/5
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -56,7 +58,7 @@ namespace ConferenceBookingApp.Controllers
 
         // GET: Bookings/Create
         // GET: Bookings/Create
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             // Lista sal (już ją znasz)
@@ -74,12 +76,12 @@ namespace ConferenceBookingApp.Controllers
         // POST: Bookings/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,StartDate,EndDate,MeetingPurpose,ConferenceRoomId,ProfessorId")] Bookings booking)
         {
-            
+
             ModelState.Remove("UserId");
             ModelState.Remove("Professor");
             ModelState.Remove("ConferenceRoom");
@@ -127,7 +129,7 @@ namespace ConferenceBookingApp.Controllers
 
             if (ModelState.IsValid)
             {
-                
+
                 booking.UserId = "BrakUzytkownika";
 
                 _context.Add(booking);
@@ -135,7 +137,7 @@ namespace ConferenceBookingApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-         
+
             var roomsList = _context.ConferenceRooms.Select(r => new { Id = r.Id, DisplayText = "Sala nr " + r.Nnumber }).ToList();
             ViewData["ConferenceRoomId"] = new SelectList(roomsList, "Id", "DisplayText", booking.ConferenceRoomId);
             ViewData["ProfessorId"] = new SelectList(_context.Professors, "Id", "FullName", booking.ProfessorId);
@@ -143,7 +145,7 @@ namespace ConferenceBookingApp.Controllers
             return View(booking);
         }
         // GET: Bookings/Edit/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -165,7 +167,7 @@ namespace ConferenceBookingApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StartDate,EndDate,MeetingPurpose,ConferenceRoomId,UserId")] Bookings bookings)
         {
             if (id != bookings.Id)
@@ -198,7 +200,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Bookings/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -217,10 +219,11 @@ namespace ConferenceBookingApp.Controllers
             return View(bookings);
         }
 
-        [Authorize]
+
         // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var bookings = await _context.Bookings.FindAsync(id);
@@ -236,6 +239,36 @@ namespace ConferenceBookingApp.Controllers
         private bool BookingsExists(int id)
         {
             return _context.Bookings.Any(e => e.Id == id);
+        }
+
+        // GET: Bookings/GetCalendarData
+        [Authorize(Roles = "Admin,User")]
+        public async Task<JsonResult> GetCalendarData()
+        {
+            var bookings = await _context.Bookings
+                .Include(b => b.ConferenceRoom)
+                .Include(b => b.Professor)
+                .ToListAsync();
+
+            // Mapujemy nasze rezerwacje na format akceptowany przez FullCalendar
+            var calendarEvents = bookings.Select(b => new
+            {
+                id = b.Id,
+                title = $"Sala {b.ConferenceRoom.Nnumber} - {b.Professor.FullName} ({b.MeetingPurpose})",
+                start = b.StartDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                end = b.EndDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                // Admin widzi czerwone, gość zielone
+                color = b.Id % 2 == 0 ? "#2c3e50" : "#16a085"
+            });
+
+            return Json(calendarEvents);
+        }
+
+        // GET: Bookings/Calendar
+        [Authorize(Roles = "Admin,User")]
+        public IActionResult Calendar()
+        {
+            return View();
         }
     }
 }

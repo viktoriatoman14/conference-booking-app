@@ -21,12 +21,14 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: ConferenceRooms
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.ConferenceRooms.ToListAsync());
         }
 
         // GET: ConferenceRooms/Details/5
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,7 +47,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: ConferenceRooms/Create
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -54,6 +56,7 @@ namespace ConferenceBookingApp.Controllers
         // POST: ConferenceRooms/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nnumber,Floor,IsAvailable")] ConferenceRooms conferenceRooms)
@@ -70,7 +73,7 @@ namespace ConferenceBookingApp.Controllers
 
 
         // GET: ConferenceRooms/Edit/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,7 +92,7 @@ namespace ConferenceBookingApp.Controllers
         // POST: ConferenceRooms/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nnumber,Floor,IsAvailable")] ConferenceRooms conferenceRooms)
@@ -123,7 +126,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: ConferenceRooms/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,7 +145,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // POST: ConferenceRooms/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -160,6 +163,39 @@ namespace ConferenceBookingApp.Controllers
         private bool ConferenceRoomsExists(int id)
         {
             return _context.ConferenceRooms.Any(e => e.Id == id);
+        }
+
+        // GET: ConferenceRooms/AvailableRooms
+        [Authorize(Roles = "Admin,User")]
+        public IActionResult AvailableRooms(DateTime? searchDate, TimeSpan? startTime, TimeSpan? endTime)
+        {
+            // Jeśli użytkownik jeszcze nic nie wpisał, pokazujemy pustą listę lub wszystkie
+            if (!searchDate.HasValue || !startTime.HasValue || !endTime.HasValue)
+            {
+                return View(new List<ConferenceRooms>());
+            }
+
+            // Łączymy datę z godzinami rozpoczęcia i zakończenia
+            DateTime startFull = searchDate.Value.Date.Add(startTime.Value);
+            DateTime endFull = searchDate.Value.Date.Add(endTime.Value);
+
+            // Wyciągamy ID sal, które w tym czasie mają JAKĄŚ rezerwację
+            var occupiedRoomIds = _context.Bookings
+                .Where(b => startFull < b.EndDate && endFull > b.StartDate)
+                .Select(b => b.ConferenceRoomId)
+                .ToList();
+
+            // Filtrujemy sale: bierzemy te, których ID NIE ma na liście zajętych
+            var availableRooms = _context.ConferenceRooms
+                .Where(r => !occupiedRoomIds.Contains(r.Id))
+                .ToList();
+
+            ViewBag.SearchDate = searchDate.Value.ToString("yyyy-MM-dd");
+            ViewBag.StartTime = startTime.Value.ToString(@"hh\:mm");
+            ViewBag.EndTime = endTime.Value.ToString(@"hh\:mm");
+            ViewBag.Searched = true;
+
+            return View(availableRooms);
         }
     }
 }

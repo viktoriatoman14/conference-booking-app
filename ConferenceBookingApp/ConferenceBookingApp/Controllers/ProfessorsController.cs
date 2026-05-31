@@ -22,12 +22,14 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Professors
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Professors.ToListAsync());
         }
 
         // GET: Professors/Details/5
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,7 +48,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Professors/Create
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -55,7 +57,7 @@ namespace ConferenceBookingApp.Controllers
         // POST: Professors/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,AcademicTitle,FirstName,LastName")] Professors professors)
@@ -70,7 +72,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Professors/Edit/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,7 +91,7 @@ namespace ConferenceBookingApp.Controllers
         // POST: Professors/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AcademicTitle,FirstName,LastName")] Professors professors)
@@ -123,7 +125,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Professors/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,7 +144,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // POST: Professors/Delete/5
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

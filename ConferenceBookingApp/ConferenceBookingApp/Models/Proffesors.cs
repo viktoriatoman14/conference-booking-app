@@ -20,5 +20,9 @@ namespace ConferenceBookingApp.Models
 
         [Display(Name = "Profesor")]
         public string FullName => $"{AcademicTitle} {FirstName} {LastName}";
+
+        [Required]
+        [Display(Name = "E-mail")]
+        public string Email { get; set; }
     }
 }
