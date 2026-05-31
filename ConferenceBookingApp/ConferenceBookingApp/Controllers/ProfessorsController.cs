@@ -60,7 +60,7 @@ namespace ConferenceBookingApp.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AcademicTitle,FirstName,LastName")] Professors professors)
+        public async Task<IActionResult> Create([Bind("Id,AcademicTitle,FirstName,LastName, Email")] Professors professors)
         {
             if (ModelState.IsValid)
             {

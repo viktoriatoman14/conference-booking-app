@@ -1,5 +1,6 @@
 ﻿using ConferenceBookingApp.Data;
 using ConferenceBookingApp.Models;
+using ConferenceBookingApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,10 +18,12 @@ namespace ConferenceBookingApp.Controllers
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
 
-        public BookingsController(ApplicationDbContext context)
+        public BookingsController(ApplicationDbContext context, IEmailSender emailSender)
         {
             _context = context;
+            _emailSender = emailSender;
         }
 
         // GET: Bookings
@@ -58,7 +61,7 @@ namespace ConferenceBookingApp.Controllers
 
         // GET: Bookings/Create
         // GET: Bookings/Create
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, User")]
         public IActionResult Create()
         {
             // Lista sal (już ją znasz)
@@ -78,7 +81,7 @@ namespace ConferenceBookingApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> Create([Bind("Id,StartDate,EndDate,MeetingPurpose,ConferenceRoomId,ProfessorId")] Bookings booking)
         {
 
@@ -125,6 +128,30 @@ namespace ConferenceBookingApp.Controllers
             if (isRoomOccupied)
             {
                 ModelState.AddModelError(string.Empty, "Ta sala jest już zarezerwowana w wybranym przedziale czasowym!");
+            }
+
+            var professor = await _context.Professors.FindAsync(booking.ProfessorId);
+            var room = await _context.ConferenceRooms.FindAsync(booking.ConferenceRoomId);
+
+            if (professor != null && !string.IsNullOrEmpty(professor.Email))
+            {
+                string temat = "Potwierdzenie rezerwacji sali konferencyjnej";
+
+                string trescHtml = $@"
+                <h2>Dzień dobry, {professor.AcademicTitle} {professor.LastName}!</h2>
+                <p>W systemie została dla Państwa utworzona nowa rezerwacja.</p>
+                <hr/>
+                <ul>
+                    <li><strong>Sala:</strong> Pokój nr {room?.Nnumber} (Piętro {room?.Floor})</li>
+                    <li><strong>Cel spotkania:</strong> {booking.MeetingPurpose}</li>
+                    <li><strong>Od:</strong> {booking.StartDate.ToString("dd.MM.yyyy HH:mm")}</li>
+                    <li><strong>Do:</strong> {booking.EndDate.ToString("dd.MM.yyyy HH:mm")}</li>
+                </ul>
+                <hr/>
+                <p>Wiadowość wygenerowana automatycznie. Prosimy na nią nie odpowiadać.</p>";
+
+                // Wysyłamy asynchronicznie
+                await _emailSender.SendEmailAsync(professor.Email, temat, trescHtml);
             }
 
             if (ModelState.IsValid)

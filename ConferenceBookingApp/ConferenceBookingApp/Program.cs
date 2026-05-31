@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ConferenceBookingApp.Data;
 using Microsoft.AspNetCore.Authentication.Cookies; // Dodane dla ciasteczek
+using ConferenceBookingApp.Services; 
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

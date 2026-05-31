@@ -1,6 +1,9 @@
-﻿namespace ConferenceBookingApp.Services
+﻿using System.Threading.Tasks;
+
+namespace ConferenceBookingApp.Services
 {
-    public class IEmailSender
+    public interface IEmailSender
     {
+        Task SendEmailAsync(string email, string subject, string message);
     }
 }
