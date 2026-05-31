@@ -73,23 +73,29 @@ namespace ConferenceBookingApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,StartDate,EndDate,MeetingPurpose,ConferenceRoomId,ProfessorId")] Bookings booking)
         {
-            // Tutaj w przyszłości damy blokadę nakładania się terminów!
+            
+            ModelState.Remove("UserId");
+            ModelState.Remove("Professor");
+            ModelState.Remove("ConferenceRoom");
 
             if (ModelState.IsValid)
             {
+                // Przed zapisem dajemy jakąś domyślną wartość dla UserId, 
+                // żeby baza danych nie krzyczała, że pole jest puste
+                booking.UserId = "BrakUzytkownika";
+
                 _context.Add(booking);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
+            // Jeśli coś pójdzie nie tak, odtwarzamy listy rozwijane
             var roomsList = _context.ConferenceRooms.Select(r => new { Id = r.Id, DisplayText = "Sala nr " + r.Nnumber }).ToList();
             ViewData["ConferenceRoomId"] = new SelectList(roomsList, "Id", "DisplayText", booking.ConferenceRoomId);
-
             ViewData["ProfessorId"] = new SelectList(_context.Professors, "Id", "FullName", booking.ProfessorId);
 
             return View(booking);
         }
-
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
