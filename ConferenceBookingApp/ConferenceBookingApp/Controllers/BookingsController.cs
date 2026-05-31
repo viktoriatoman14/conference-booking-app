@@ -78,10 +78,50 @@ namespace ConferenceBookingApp.Controllers
             ModelState.Remove("Professor");
             ModelState.Remove("ConferenceRoom");
 
+            TimeSpan openTime = new TimeSpan(8, 0, 0);
+            TimeSpan closeTime = new TimeSpan(22, 15, 0);
+
+            // Czy data zakończenia jest po dacie rozpoczęcia
+            if (booking.EndDate <= booking.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "Data zakończenia spotkania musi być późniejsza niż data rozpoczęcia!");
+            }
+
+            // Czy rezerwacja nie dotyczy przeszłości
+            if (booking.StartDate < DateTime.Now)
+            {
+                ModelState.AddModelError("StartDate", "Nie można rezerwować sali na czas, który już minął!");
+            }
+            //nie można zarezerwowac sali na kilka dni
+            if (booking.StartDate.Date != booking.EndDate.Date)
+            {
+                ModelState.AddModelError("EndDate", "Rezerwacja musi rozpoczynać i kończyć się tego samego dnia! Nie można rezerwować sali na wiele dni.");
+            }
+
+            if (booking.StartDate.TimeOfDay < openTime || booking.StartDate.TimeOfDay > closeTime)
+            {
+                ModelState.AddModelError("StartDate", "Sala może być rezerwowana wyłącznie w godzinach od 08:00 do 22:15!");
+            }
+
+            if (booking.EndDate.TimeOfDay < openTime || booking.EndDate.TimeOfDay > closeTime)
+            {
+                ModelState.AddModelError("EndDate", "Godzina zakończenia spotkania musi mieścić się w przedziale od 08:00 do 22:15!");
+            }
+
+            bool isRoomOccupied = _context.Bookings.Any(b =>
+                b.ConferenceRoomId == booking.ConferenceRoomId &&
+                booking.StartDate < b.EndDate &&
+                booking.EndDate > b.StartDate
+            );
+
+            if (isRoomOccupied)
+            {
+                ModelState.AddModelError(string.Empty, "Ta sala jest już zarezerwowana w wybranym przedziale czasowym!");
+            }
+
             if (ModelState.IsValid)
             {
-                // Przed zapisem dajemy jakąś domyślną wartość dla UserId, 
-                // żeby baza danych nie krzyczała, że pole jest puste
+                
                 booking.UserId = "BrakUzytkownika";
 
                 _context.Add(booking);
@@ -89,7 +129,7 @@ namespace ConferenceBookingApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Jeśli coś pójdzie nie tak, odtwarzamy listy rozwijane
+         
             var roomsList = _context.ConferenceRooms.Select(r => new { Id = r.Id, DisplayText = "Sala nr " + r.Nnumber }).ToList();
             ViewData["ConferenceRoomId"] = new SelectList(roomsList, "Id", "DisplayText", booking.ConferenceRoomId);
             ViewData["ProfessorId"] = new SelectList(_context.Professors, "Id", "FullName", booking.ProfessorId);
