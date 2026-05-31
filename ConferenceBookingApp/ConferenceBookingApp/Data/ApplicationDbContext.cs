@@ -10,7 +10,7 @@ namespace ConferenceBookingApp.Data
             : base(options)
         {
         }
-
+        public DbSet<ConferenceBookingApp.Models.Professors> Professors { get; set; }
         public DbSet<ConferenceRooms> ConferenceRooms { get; set; }
         public DbSet<Bookings> Bookings { get; set; }
     }

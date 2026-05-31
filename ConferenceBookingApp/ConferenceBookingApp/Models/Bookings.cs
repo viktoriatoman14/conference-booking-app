@@ -30,5 +30,12 @@ namespace ConferenceBookingApp.Models
 
         [Required]
         public string UserId { get; set; } = string.Empty;
+
+        // Klucz obcy do tabeli Profesorów
+        [Display(Name = "Profesor")]
+        public int ProfessorId { get; set; }
+
+        //pobieranie pełnych danych profesora
+        public Professors Professor { get; set; }
     }
 }
