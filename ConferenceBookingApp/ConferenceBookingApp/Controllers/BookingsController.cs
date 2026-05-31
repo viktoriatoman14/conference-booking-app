@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using ConferenceBookingApp.Data;
+using ConferenceBookingApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ConferenceBookingApp.Data;
-using ConferenceBookingApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 
 namespace ConferenceBookingApp.Controllers
 {
+ 
+
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -52,6 +56,7 @@ namespace ConferenceBookingApp.Controllers
 
         // GET: Bookings/Create
         // GET: Bookings/Create
+        [Authorize]
         public IActionResult Create()
         {
             // Lista sal (już ją znasz)
@@ -69,6 +74,7 @@ namespace ConferenceBookingApp.Controllers
         // POST: Bookings/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,StartDate,EndDate,MeetingPurpose,ConferenceRoomId,ProfessorId")] Bookings booking)
@@ -137,6 +143,7 @@ namespace ConferenceBookingApp.Controllers
             return View(booking);
         }
         // GET: Bookings/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -158,6 +165,7 @@ namespace ConferenceBookingApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,StartDate,EndDate,MeetingPurpose,ConferenceRoomId,UserId")] Bookings bookings)
         {
             if (id != bookings.Id)
@@ -190,6 +198,7 @@ namespace ConferenceBookingApp.Controllers
         }
 
         // GET: Bookings/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -208,6 +217,7 @@ namespace ConferenceBookingApp.Controllers
             return View(bookings);
         }
 
+        [Authorize]
         // POST: Bookings/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
