@@ -14,8 +14,8 @@ Aplikacja internetowa zrealizowana w technologii ASP.NET Core MVC (C#), służą
 - **Frontend:** HTML5, CSS3, JS, Bootstrap 5.
 
 ## Dokumentacja
-- [Dokumentacja Techniczna](TECHNICAL_DOCUMENTATION.md) - Opis architektury i bazy danych.
-- [Instrukcja Użytkownika](USER_MANUAL.md) - Przewodnik dla użytkowników nietechnicznych.
+- Dokumentacja Techniczna - Opis architektury i bazy danych.
+- Instrukcja Użytkownika - Przewodnik dla użytkowników nietechnicznych.
 
 ## Instrukcja uruchomienia
 
