@@ -8,9 +8,10 @@
     <div class="card shadow">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Lista Rezerwacji Sal</h4>
-            @if (User.IsInRole("Admin"))
+
+            @if (User.Identity.IsAuthenticated)
             {
-                <a asp-action="Create" class="btn btn-success btn-sm">Dodaj nową rezerwację</a>
+                <a asp-action="Create" class="btn btn-success btn-sm">Zarezerwuj salę</a>
             }
         </div>
         <div class="card-body">

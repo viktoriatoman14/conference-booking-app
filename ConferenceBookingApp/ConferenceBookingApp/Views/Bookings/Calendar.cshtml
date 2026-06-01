@@ -6,7 +6,7 @@
     <div class="card shadow rounded-4 overflow-hidden border-0">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3 px-4">
             <h4 class="mb-0 fw-semibold">📅 Harmonogram Rezerwacji Sal</h4>
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("Admin, User"))
             {
                 <a asp-action="Create" class="btn btn-success btn-sm rounded-3 px-3 fw-medium shadow-sm">Dodaj rezerwację</a>
             }
@@ -22,90 +22,71 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/pl.global.min.js"></script>
 
 <style>
-    #calendar {
-        max-width: 100%;
-        margin: 0 auto;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* 1. Ograniczenie wielkości kalendarza i dodanie przewijania */
+    .fc {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        /* Max wysokość, dzięki której kalendarz nie ciągnie się bez końca w dół */
+        max-height: 650px !important;
     }
 
-    /* WYMUSZENIE SZEROKOŚCI: Gwarancja, że zmieści się pełny tekst typu "12:00" */
-    .fc .fc-timegrid-axis,
-    .fc .fc-timegrid-slot-label {
-        width: 75px !important;
-        min-width: 75px !important;
-        max-width: 75px !important;
-        background-color: #f8f9fa !important; /* Estetyczne jasne tło dla kolumny godzin */
+    /* Dopasowanie wysokości samej siatki godzinowej i dodanie estetycznego scrolla */
+    .fc-scroller {
+        overflow-y: auto !important;
     }
 
-    /* Formatowanie tekstu godzin na osi - ciemniejsza i bardziej czytelna czcionka */
-    .fc .fc-timegrid-slot-label-cushion {
-        display: block !important;
-        text-align: right !important;
-        padding-right: 10px !important;
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        color: #212529 !important; /* Głęboka, czytelna czerń */
-    }
-
-    /* Wygląd nagłówków dni tygodnia */
-    .fc .fc-col-header-cell {
-        background-color: #f8f9fa !important;
-        padding: 10px 0 !important;
-        border-color: #e9ecef !important;
-    }
-
-    .fc .fc-col-header-cell-cushion {
-        font-weight: 600 !important;
-        text-decoration: none !important;
-        color: #0d6efd !important;
-    }
-
-    /* Estetyka siatki i klocków rezerwacji */
-    .fc .fc-timegrid-slots td {
-        border-color: #f1f3f5 !important;
-        height: 3.5rem !important; /* Nieco wyższe wiersze dla jeszcze większej przejrzystości */
-    }
-
-    /* Wygląd wydarzeń (klocków rezerwacji) */
-    .fc-v-event {
-        border: none !important;
-        border-left: 4px solid #0d6efd !important;
+    /* 2. Stylowanie kafelka wydarzenia (rezerwacji) */
+    .fc-event {
+        background-color: rgba(13, 110, 253, 0.12) !important;
+        border: 1px solid #0d6efd !important;
+        border-left-width: 4px !important;
         border-radius: 6px !important;
-        padding: 6px 8px !important;
-        background-color: #e7f1ff !important; /* Delikatne niebieskie tło klocka */
-        color: #0c4128 !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+        padding: 3px 5px !important;
+        transition: transform 0.2s;
+        cursor: pointer;
     }
 
-    /* Stylizacja przycisków nawigacji FullCalendar, aby pasowały do motywu bg-dark */
-    .fc .fc-button-primary {
-        background-color: #2b3035 !important;
-        border-color: #2b3035 !important;
-        font-weight: 500 !important;
-        text-transform: capitalize !important;
-        transition: background-color 0.15s ease-in-out !important;
-    }
-
-        .fc .fc-button-primary:hover {
-            background-color: #1c1f23 !important;
-            border-color: #1c1f23 !important;
+        .fc-event:hover {
+            transform: scale(1.02);
         }
 
-        .fc .fc-button-primary:disabled {
-            background-color: #6c757d !important;
-            border-color: #6c757d !important;
-            opacity: 0.65;
-        }
-
-    /* Styl dla aktywnego widoku (np. wciśnięty przycisk "Tydzień") */
-    .fc .fc-button-active {
-        background-color: #000000 !important;
-        border-color: #000000 !important;
+    /* Tekst rezerwacji - wyraźny i czytelny */
+    .fc-event-main, .fc-event-title, .fc-event-time {
+        color: #1e293b !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        white-space: normal !important;
     }
 
-    /* Zaokrąglenie ramek samego kalendarza wewnątrz karty */
-    .fc-theme-standard th, .fc-theme-standard td {
-        border-color: #e9ecef !important;
+    /* 3. POPRAWKA: Naprawa znikającego tekstu dzisiejszego dnia */
+    .fc-col-header-cell {
+        background-color: #212529 !important; /* Domyślne ciemne tło dla dni */
+        padding: 8px 0 !important;
+    }
+
+    /* Wymuszenie białego tekstu dla zwykłych dni */
+    .fc-col-header-cell-cushion {
+        color: #ffffff !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+    }
+
+    /* Specjalna poprawka dla dzisiejszego nagłówka, aby tekst NIE znikał */
+    .fc-sidebar-title,
+    .fc-col-header-cell.fc-day-today {
+        background-color: #0d6efd !important; /* Wyróżniamy dzisiejszy dzień ładnym niebieskim kolorem */
+    }
+
+        .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+            color: #ffffff !important; /* Wymuszamy biały, doskonale widoczny tekst na niebieskim tle */
+        }
+
+    /* Subtelne tło dla całej kolumny aktualnego dnia w siatce godzinowej */
+    .fc-day-today {
+        background-color: rgba(13, 110, 253, 0.03) !important;
     }
 </style>
 

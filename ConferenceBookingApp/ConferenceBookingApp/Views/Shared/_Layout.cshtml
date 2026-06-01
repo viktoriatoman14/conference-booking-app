@@ -8,6 +8,26 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ConferenceBookingApp.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            /* Wklejamy Twój pastelowy obrazek jako tło dla całego systemu */
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Tło stoi w miejscu podczas przewijania */
+            min-height: 100vh;
+        }
+
+        /* Sprawiamy, że tabele i karty będą lekko przezroczyste, by tło ładnie przebijało */
+        .card {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(5px); /* Delikatne rozmycie tła pod kartą */
+        }
+
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <header>
@@ -23,6 +43,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark fw-medium rounded-2 px-3" asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door me-1 text-secondary"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium rounded-2 px-3" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-lock me-1 text-secondary"></i> Privacy
                             </a>
                         </li>
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -52,13 +77,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium rounded-2 px-3" asp-area="" asp-controller="Home" asp-action="Privacy">
-                                <i class="bi bi-shield-lock me-1 text-secondary"></i> Privacy
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark fw-medium rounded-2 px-3" asp-area="" asp-controller="Professors" asp-action="Index">
-                                <i class="bi bi-person-workspace me-1 text-secondary"></i> Profesorowie
+                                <i class="bi bi-person-workspace me-1 text-secondary"></i> Nauczyciele Akademiccy
                             </a>
                         </li>
                         <li class="nav-item">

@@ -94,7 +94,7 @@ namespace ConferenceBookingApp.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AcademicTitle,FirstName,LastName")] Professors professors)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AcademicTitle,FirstName,LastName, Email")] Professors professors)
         {
             if (id != professors.Id)
             {
