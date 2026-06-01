@@ -22,23 +22,20 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/pl.global.min.js"></script>
 
 <style>
-    /* 1. Ograniczenie wielkości kalendarza i dodanie przewijania */
     .fc {
         background-color: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(10px);
         border-radius: 12px;
         padding: 15px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        /* Max wysokość, dzięki której kalendarz nie ciągnie się bez końca w dół */
+
         max-height: 650px !important;
     }
 
-    /* Dopasowanie wysokości samej siatki godzinowej i dodanie estetycznego scrolla */
     .fc-scroller {
         overflow-y: auto !important;
     }
 
-    /* 2. Stylowanie kafelka wydarzenia (rezerwacji) */
     .fc-event {
         background-color: rgba(13, 110, 253, 0.12) !important;
         border: 1px solid #0d6efd !important;
@@ -53,7 +50,6 @@
             transform: scale(1.02);
         }
 
-    /* Tekst rezerwacji - wyraźny i czytelny */
     .fc-event-main, .fc-event-title, .fc-event-time {
         color: #1e293b !important;
         font-weight: 600 !important;
@@ -61,30 +57,26 @@
         white-space: normal !important;
     }
 
-    /* 3. POPRAWKA: Naprawa znikającego tekstu dzisiejszego dnia */
     .fc-col-header-cell {
-        background-color: #212529 !important; /* Domyślne ciemne tło dla dni */
+        background-color: #212529 !important; 
         padding: 8px 0 !important;
     }
 
-    /* Wymuszenie białego tekstu dla zwykłych dni */
     .fc-col-header-cell-cushion {
         color: #ffffff !important;
         text-decoration: none !important;
         font-weight: 600 !important;
     }
 
-    /* Specjalna poprawka dla dzisiejszego nagłówka, aby tekst NIE znikał */
     .fc-sidebar-title,
     .fc-col-header-cell.fc-day-today {
-        background-color: #0d6efd !important; /* Wyróżniamy dzisiejszy dzień ładnym niebieskim kolorem */
+        background-color: #0d6efd !important; 
     }
 
         .fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
-            color: #ffffff !important; /* Wymuszamy biały, doskonale widoczny tekst na niebieskim tle */
+            color: #ffffff !important; 
         }
 
-    /* Subtelne tło dla całej kolumny aktualnego dnia w siatce godzinowej */
     .fc-day-today {
         background-color: rgba(13, 110, 253, 0.03) !important;
     }
@@ -100,9 +92,7 @@
             slotMinTime: '08:00:00',
             slotMaxTime: '23:00:00',
             allDaySlot: false,
-            slotDuration: '01:00:00', // Linie siatki co pełną godzinę
-
-            // NADPISANIE FORMATU: To bezpośrednio wymusza format "8:00" zamiast systemowego "08"
+            slotDuration: '01:00:00', 
             slotLabelFormat: {
                 hour: 'numeric',
                 minute: '2-digit',
@@ -118,6 +108,14 @@
             eventClick: function(info) {
                 window.location.href = '/Bookings/Details/' + info.event.id;
             }
+
+            windowResize: function(view) {
+        if (window.innerWidth < 768) {
+            calendar.changeView('listWeek'); // Na telefonie jako lista
+        } else {
+            calendar.changeView('timeGridWeek'); // Na komputerze 
+        }
+    },
         });
 
         calendar.render();

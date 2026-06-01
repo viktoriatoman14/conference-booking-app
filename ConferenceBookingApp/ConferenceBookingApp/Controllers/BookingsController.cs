@@ -30,7 +30,6 @@ namespace ConferenceBookingApp.Controllers
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Index()
         {
-            // Dołączamy zarówno salę, jak i profesora do zapytania
             var bookings = await _context.Bookings
                 .Include(b => b.ConferenceRoom)
                 .Include(b => b.Professor)
@@ -64,15 +63,11 @@ namespace ConferenceBookingApp.Controllers
         [Authorize(Roles = "Admin, User")]
         public IActionResult Create()
         {
-            // Lista sal (już ją znasz)
             var roomsList = _context.ConferenceRooms
                 .Select(r => new { Id = r.Id, DisplayText = "Sala nr " + r.Nnumber })
                 .ToList();
             ViewData["ConferenceRoomId"] = new SelectList(roomsList, "Id", "DisplayText");
-
-            // NOWOŚĆ: Lista profesorów do menu rozwijanego
             ViewData["ProfessorId"] = new SelectList(_context.Professors, "Id", "FullName");
-
             return View();
         }
 
@@ -149,8 +144,6 @@ namespace ConferenceBookingApp.Controllers
                 </ul>
                 <hr/>
                 <p>Wiadowość wygenerowana automatycznie. Prosimy na nią nie odpowiadać.</p>";
-
-                // Wysyłamy asynchronicznie
                 await _emailSender.SendEmailAsync(professor.Email, temat, trescHtml);
             }
 
@@ -284,7 +277,6 @@ namespace ConferenceBookingApp.Controllers
                 title = $"Sala {b.ConferenceRoom.Nnumber} - {b.Professor.FullName} ({b.MeetingPurpose})",
                 start = b.StartDate.ToString("yyyy-MM-ddTHH:mm:ss"),
                 end = b.EndDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                // Admin widzi czerwone, gość zielone
                 color = b.Id % 2 == 0 ? "#2c3e50" : "#16a085"
             });
 

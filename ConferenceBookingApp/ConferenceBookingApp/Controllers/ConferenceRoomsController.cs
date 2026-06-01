@@ -169,7 +169,6 @@ namespace ConferenceBookingApp.Controllers
         [Authorize(Roles = "Admin,User")]
         public IActionResult AvailableRooms(DateTime? searchDate, TimeSpan? startTime, TimeSpan? endTime)
         {
-            // Jeśli użytkownik jeszcze nic nie wpisał, pokazujemy pustą listę lub wszystkie
             if (!searchDate.HasValue || !startTime.HasValue || !endTime.HasValue)
             {
                 return View(new List<ConferenceRooms>());
@@ -179,13 +178,13 @@ namespace ConferenceBookingApp.Controllers
             DateTime startFull = searchDate.Value.Date.Add(startTime.Value);
             DateTime endFull = searchDate.Value.Date.Add(endTime.Value);
 
-            // Wyciągamy ID sal, które w tym czasie mają JAKĄŚ rezerwację
+            // Wyciągamy ID sal, które w tym czasie mają jakąs rezerwację
             var occupiedRoomIds = _context.Bookings
                 .Where(b => startFull < b.EndDate && endFull > b.StartDate)
                 .Select(b => b.ConferenceRoomId)
                 .ToList();
 
-            // Filtrujemy sale: bierzemy te, których ID NIE ma na liście zajętych
+            // Filtrujemy sale: bierzemy te, których ID nie ma na liście zajętych
             var availableRooms = _context.ConferenceRooms
                 .Where(r => !occupiedRoomIds.Contains(r.Id))
                 .ToList();

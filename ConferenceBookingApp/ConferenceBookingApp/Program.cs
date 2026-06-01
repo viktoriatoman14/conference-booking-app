@@ -7,17 +7,15 @@ using ConferenceBookingApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Pobranie konfiguracji po³¹czenia z pliku appsettings.json
+// Pobranie konfiguracji po³¹czenia z pliku appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// 2. Rejestracja naszego ApplicationDbContext w systemie
+//Rejestracja naszego ApplicationDbContext w systemie
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// ==========================================
-// NOWOŒÆ: Rejestracja autentykacji ciasteczkowej
-// ==========================================
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -25,7 +23,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(20); // Czas sesji
     });
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -33,8 +30,6 @@ builder.Services.AddTransient<IEmailSender, EmailSender>();
 var app = builder.Build();
 
 
-
-// Configure the HTTP request pipeline.
 
 if (!app.Environment.IsDevelopment())
 {
@@ -49,12 +44,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ==========================================
-// WA¯NE: Najpierw sprawdzamy KIM KTOŒ JEST (Authentication), 
-// a potem CO MO¯E ROBIÆ (Authorization)
-// ==========================================
-app.UseAuthentication();
-app.UseAuthorization();
+
+app.UseAuthentication();//czy mo¿e siê zalogowaæ
+app.UseAuthorization();//jakie ma uprawnienia   
 
 app.MapControllerRoute(
     name: "default",

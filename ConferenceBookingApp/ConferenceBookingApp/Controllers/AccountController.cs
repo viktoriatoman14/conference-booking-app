@@ -7,38 +7,38 @@ namespace ConferenceBookingApp.Controllers
 {
     public class AccountController : Controller
     {
-        // 1. Wyświetlanie formularza logowania
+        // Wyświetlanie formularza logowania
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // 2. Obsługa wysłania formularza
+        // wysłanie formularza
         [HttpPost]
         public async Task<IActionResult> Login(string login, string password)
         {
             string role = "";
 
-            // 1. Sprawdzamy czy to ADMIN (tutaj wpisz swoje nowe hasło!)
+            // admin
             if (login == "admin" && password == "admin123!")
             {
                 role = "Admin";
             }
-            // 2. Sprawdzamy czy to ZWYKŁY UŻYTKOWNIK (do przeglądania)
+            // uzytkownik(gosc)
             else if (login == "gosc" && password == "gosc123")
             {
                 role = "User";
             }
 
-            // Jeśli login i hasło pasowały do kogoś:
+            //login i hasło pasowały
             if (!string.IsNullOrEmpty(role))
             {
 
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, login),
-            new Claim(ClaimTypes.Role, role) // Przypisujemy rolę: Admin lub User
+            new Claim(ClaimTypes.Role, role) //Admin lub User
         };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -51,7 +51,7 @@ namespace ConferenceBookingApp.Controllers
             return View();
         }
 
-        // 3. Wylogowanie
+        // wylogowanie
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
