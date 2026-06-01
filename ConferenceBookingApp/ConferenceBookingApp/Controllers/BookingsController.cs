@@ -143,7 +143,7 @@ namespace ConferenceBookingApp.Controllers
                     <li><strong>Do:</strong> {booking.EndDate.ToString("dd.MM.yyyy HH:mm")}</li>
                 </ul>
                 <hr/>
-                <p>Wiadowość wygenerowana automatycznie. Prosimy na nią nie odpowiadać.</p>";
+                <p>Wiadomość wygenerowana automatycznie. Prosimy na nią nie odpowiadać.</p>";
                 await _emailSender.SendEmailAsync(professor.Email, temat, trescHtml);
             }
 

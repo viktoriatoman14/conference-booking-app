@@ -1,0 +1,26 @@
+## [Visual Studio]
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+## [Visual Studio Code]
+.vscode/
+
+## [User-specific files]
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## [Build results]
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]est[Rr]esults/
+
+## [Other]
+.DS_Store
+Thumbs.db
