@@ -13,5 +13,6 @@ namespace ConferenceBookingApp.Data
         public DbSet<ConferenceBookingApp.Models.Professors> Professors { get; set; }
         public DbSet<ConferenceRooms> ConferenceRooms { get; set; }
         public DbSet<Bookings> Bookings { get; set; }
+        public DbSet<PageContent> PageContents { get; set; }
     }
 }

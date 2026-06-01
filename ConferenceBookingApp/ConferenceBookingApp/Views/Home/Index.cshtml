@@ -1,12 +1,16 @@
-﻿@{
+@model IEnumerable<ConferenceBookingApp.Models.PageContent>
+
+@{
     ViewData["Title"] = "Strona Główna";
+    var homeTitle = Model?.FirstOrDefault(c => c.Key == "HomeTitle")?.Value ?? "Witaj w systemie rezerwacji sal!";
+    var homeDesc = Model?.FirstOrDefault(c => c.Key == "HomeDescription")?.Value ?? "Zarządzaj harmonogramem zajęć, sprawdzaj dostępność sal oraz rezerwuj przestrzenie w prosty i intuicyjny sposób.";
 }
 
 <div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
     <div class="text-center p-5 rounded shadow" style="background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); max-width: 600px;">
-        <h1 class="display-4 fw-bold text-dark mb-3">Witaj w systemie rezerwacji sal!</h1>
+        <h1 class="display-4 fw-bold text-dark mb-3">@homeTitle</h1>
         <p class="lead text-muted mb-4">
-            Zarządzaj harmonogramem zajęć, sprawdzaj dostępność sal oraz rezerwuj przestrzenie w prosty i intuicyjny sposób.
+            @homeDesc
         </p>
 
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
